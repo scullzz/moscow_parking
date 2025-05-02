@@ -1,15 +1,7 @@
-import {
-  Box,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  OutlinedInput,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import { useState } from "react";
 
-const formControlStyle = {
+const inputStyle = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
     backgroundColor: "#fff",
@@ -27,9 +19,6 @@ const formControlStyle = {
   },
   "& .Mui-focused .MuiInputLabel-root": {
     color: "#59C36A",
-  },
-  "& svg": {
-    color: "#b0b0b0",
   },
 };
 
@@ -50,69 +39,39 @@ const SettingsPage = () => {
         px: 3,
       }}
     >
-      <FormControl fullWidth sx={formControlStyle} size="medium">
-        <InputLabel id="login-label">Логин</InputLabel>
-        <Select
-          labelId="login-label"
-          value={login}
-          label="Логин"
-          onChange={(e: SelectChangeEvent) => setLogin(e.target.value)}
-          input={<OutlinedInput label="Логин" />}
-        >
-          <MenuItem value="">Select platform</MenuItem>
-          <MenuItem value="option1">Option 1</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth sx={formControlStyle} size="medium">
-        <InputLabel id="password-label">Пароль</InputLabel>
-        <Select
-          labelId="password-label"
-          value={password}
-          label="Пароль"
-          onChange={(e: SelectChangeEvent) => setPassword(e.target.value)}
-          input={<OutlinedInput label="Пароль" />}
-        >
-          <MenuItem value="">Select platform</MenuItem>
-          <MenuItem value="option1">Option 1</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth sx={formControlStyle} size="medium">
-        <InputLabel id="complete-after-label">
-          Завершать после оплаты через
-        </InputLabel>
-        <Select
-          labelId="complete-after-label"
-          value={completeAfterPayment}
-          label="Завершать после оплаты через"
-          onChange={(e: SelectChangeEvent) =>
-            setCompleteAfterPayment(e.target.value)
-          }
-          input={<OutlinedInput label="Завершать после оплаты через" />}
-        >
-          <MenuItem value="">Select platform</MenuItem>
-          <MenuItem value="option1">Option 1</MenuItem>
-        </Select>
-      </FormControl>
-
-      <FormControl fullWidth sx={formControlStyle} size="medium">
-        <InputLabel id="register-after-label">
-          Оформлять после завершения через
-        </InputLabel>
-        <Select
-          labelId="register-after-label"
-          value={registerAfterComplete}
-          label="Оформлять после завершения через"
-          onChange={(e: SelectChangeEvent) =>
-            setRegisterAfterComplete(e.target.value)
-          }
-          input={<OutlinedInput label="Оформлять после завершения через" />}
-        >
-          <MenuItem value="">Select platform</MenuItem>
-          <MenuItem value="option1">Option 1</MenuItem>
-        </Select>
-      </FormControl>
+      <TextField
+        label="Логин"
+        fullWidth
+        value={login}
+        onChange={(e) => setLogin(e.target.value)}
+        sx={inputStyle}
+        size="medium"
+      />
+      <TextField
+        label="Пароль"
+        fullWidth
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        sx={inputStyle}
+        size="medium"
+        type="password"
+      />
+      <TextField
+        label="Завершать после оплаты через"
+        fullWidth
+        value={completeAfterPayment}
+        onChange={(e) => setCompleteAfterPayment(e.target.value)}
+        sx={inputStyle}
+        size="medium"
+      />
+      <TextField
+        label="Оформлять после завершения через"
+        fullWidth
+        value={registerAfterComplete}
+        onChange={(e) => setRegisterAfterComplete(e.target.value)}
+        sx={inputStyle}
+        size="medium"
+      />
     </Box>
   );
 };
