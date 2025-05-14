@@ -1,17 +1,38 @@
 import { Box, List, ListItem, ListItemText, IconButton } from "@mui/material";
 import { ChevronRight } from "@mui/icons-material";
+import { useEffect, useState } from "react";
+
+interface IContact {
+  title: string;
+  url: string;
+}
 
 function ContactsPage() {
-  const items = [
-    {
-      title: "Наш telegram канал",
-      url: "https://google.com",
-    },
-    {
-      title: "Техническая поддержка",
-      url: "https://google.com",
-    },
-  ];
+  const [items, setItems] = useState<IContact[]>([]);
+
+  const getAllContacts = async () => {
+    try {
+      const response = await fetch(
+        "https://api.projectdevdnkchain.ru/contact/",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            auth: "123",
+          },
+        }
+      );
+
+      const res = await response.json();
+      setItems(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getAllContacts();
+  }, []);
 
   const handleClick = (url: string) => {
     window.open(url, "_blank");

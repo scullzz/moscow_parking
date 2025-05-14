@@ -1,68 +1,68 @@
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Typography,
   Button,
   Container,
   Paper,
-  // CircularProgress,
+  CircularProgress,
 } from "@mui/material";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-// import { tg } from "../main";
+import { tg } from "../main";
 const SuccessPayment = () => {
-  // const [loading, setLoading] = useState(true);
-  // const [status, setStatus] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   const fetchPaymentStatus = async () => {
-  //     try {
-  //       const auth = tg?.initData;
+  useEffect(() => {
+    const fetchPaymentStatus = async () => {
+      try {
+        const auth = tg?.initData;
 
-  //       const lastRes = await fetch("https://api.a-b-d.ru/payhistory/last", {
-  //         headers: {
-  //           accept: "application/json",
-  //           auth,
-  //         },
-  //       });
-  //       const lastData = await lastRes.json();
-  //       const invoiceId = lastData.invoice_id;
+        const lastRes = await fetch("https://api.a-b-d.ru/payhistory/last", {
+          headers: {
+            accept: "application/json",
+            auth,
+          },
+        });
+        const lastData = await lastRes.json();
+        const invoiceId = lastData.invoice_id;
 
-  //       const checkRes = await fetch(
-  //         `https://api.a-b-d.ru/payhistory/check/${invoiceId}`,
-  //         {
-  //           headers: {
-  //             accept: "application/json",
-  //             auth,
-  //           },
-  //         }
-  //       );
-  //       const checkData = await checkRes.json();
-  //       setStatus(checkData.status);
-  //     } catch (error) {
-  //       console.error("Ошибка при получении статуса платежа:", error);
-  //       setStatus("Ошибка");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
+        const checkRes = await fetch(
+          `https://api.a-b-d.ru/payhistory/check/${invoiceId}`,
+          {
+            headers: {
+              accept: "application/json",
+              auth,
+            },
+          }
+        );
+        const checkData = await checkRes.json();
+        setStatus(checkData.status);
+      } catch (error) {
+        console.error("Ошибка при получении статуса платежа:", error);
+        setStatus("Ошибка");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  //   fetchPaymentStatus();
-  // }, []);
+    fetchPaymentStatus();
+  }, []);
 
-  // if (loading) {
-  //   return (
-  //     <Container
-  //       maxWidth="sm"
-  //       sx={{
-  //         minHeight: "100vh",
-  //         display: "flex",
-  //         alignItems: "center",
-  //         justifyContent: "center",
-  //       }}
-  //     >
-  //       <CircularProgress />
-  //     </Container>
-  //   );
-  // }
+  if (loading) {
+    return (
+      <Container
+        maxWidth="sm"
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container

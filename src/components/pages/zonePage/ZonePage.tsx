@@ -1,4 +1,5 @@
 import { Box, Typography, Card, CardContent, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const ZoneCard = ({
   showButton = false,
@@ -42,6 +43,8 @@ const ZoneCard = ({
 );
 
 const ZonePage = () => {
+  const nav = useNavigate();
+
   return (
     <Box sx={{ p: 2, pb: 16 }}>
       <Box
@@ -61,7 +64,7 @@ const ZonePage = () => {
             display: "flex",
             alignItems: "center",
             fontWeight: "bold",
-            height: "30px"
+            height: "30px",
           }}
         >
           1000 🪙
@@ -106,6 +109,9 @@ const ZonePage = () => {
             borderRadius: "12px",
             fontWeight: "bold",
             height: "48px",
+          }}
+          onClick={() => {
+            nav("/list");
           }}
         >
           + Арендовать парковку

@@ -19,13 +19,14 @@ function HomePage() {
 
   const handleStart = () => {
     console.log("НАЧАТЬ", { zone, vehicle, type });
-    nav('/list')
+    nav("/list");
   };
 
   const handleCancel = () => {
     setZone("");
     setVehicle("");
     setType("");
+    nav("/");
   };
 
   const formControlStyle = {

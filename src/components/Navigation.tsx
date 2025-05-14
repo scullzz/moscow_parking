@@ -1,9 +1,8 @@
-// src/components/Navigation.tsx
 import { BottomNavigation, BottomNavigationAction, Paper } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium"; // корона
-import SettingsIcon from "@mui/icons-material/Settings"; // шестерёнка
-import MailIcon from "@mui/icons-material/Mail"; // конверт
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import SettingsIcon from "@mui/icons-material/Settings";
+import MailIcon from "@mui/icons-material/Mail";
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
