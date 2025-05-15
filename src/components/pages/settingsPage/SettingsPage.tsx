@@ -8,6 +8,7 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useEffect, useState } from "react";
+import { tg } from "../../../main";
 
 const inputStyle = {
   mb: 2,
@@ -44,7 +45,7 @@ const SettingsPage = () => {
     try {
       const r = await fetch("https://api.projectdevdnkchain.ru/users/me", {
         method: "GET",
-        headers: { "Content-Type": "application/json", auth: "123" },
+        headers: { "Content-Type": "application/json", auth: tg?.initData },
       });
       const res = await r.json();
 
@@ -63,7 +64,7 @@ const SettingsPage = () => {
     try {
       await fetch("https://api.projectdevdnkchain.ru/users/me", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", auth: "123" },
+        headers: { "Content-Type": "application/json", auth: tg?.initData },
         body: JSON.stringify({
           website_login: login,
           website_password: password,

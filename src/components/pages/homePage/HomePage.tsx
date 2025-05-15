@@ -1,3 +1,5 @@
+// HomePage.tsx
+import { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -7,19 +9,89 @@ import {
   OutlinedInput,
   Select,
   SelectChangeEvent,
+  Snackbar,
+  Alert,
 } from "@mui/material";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { tg } from "../../../main";
+
+/* ---------- типы ---------- */
+interface ZoneOption {
+  id: number;
+  zone_id: string;
+  name: string;
+}
+
+interface VehicleOption {
+  id: number;
+  license_plate: string;
+  vehicle_type: string;
+}
 
 function HomePage() {
   const nav = useNavigate();
-  const [zone, setZone] = useState("");
-  const [vehicle, setVehicle] = useState("");
-  const [type, setType] = useState("");
 
+  /* ---------- state ---------- */
+  const [zones, setZones] = useState<ZoneOption[]>([]);
+  const [vehicles, setVehicles] = useState<VehicleOption[]>([]);
+
+  const [zone, setZone] = useState(""); // option_id (string)
+  const [vehicle, setVehicle] = useState(""); // vehicle_id (string)
+  const [type, setType] = useState(""); // "standard" | "advanced"
+
+  /* ---------- alert ---------- */
+  const [alert, setAlert] = useState<{
+    open: boolean;
+    severity: "success" | "error";
+    message: string;
+  }>({ open: false, severity: "success", message: "" });
+
+  /* ---------- загрузка данных ---------- */
+  useEffect(() => {
+    /* зоны */
+    fetch("https://api.projectdevdnkchain.ru/parking/options", {
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
+    })
+      .then((r) => r.json())
+      .then((d: ZoneOption[]) => setZones(d))
+      .catch((e) => console.error("Zones error:", e));
+
+    /* транспортные средства */
+    fetch("https://api.projectdevdnkchain.ru/vehicles/", {
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
+    })
+      .then((r) => r.json())
+      .then((d: VehicleOption[]) => setVehicles(d))
+      .catch((e) => console.error("Vehicles error:", e));
+  }, []);
+
+  /* ---------- действия ---------- */
   const handleStart = () => {
-    console.log("НАЧАТЬ", { zone, vehicle, type });
-    nav("/list");
+    const body = {
+      vehicle_id: Number(vehicle),
+      option_id: Number(zone),
+      hours: 0, // при необходимости замени на реальные данные
+      minutes: 0,
+      type, // "standard" | "advanced"
+      status: "pending",
+    };
+
+    fetch("https://api.projectdevdnkchain.ru/parking/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
+      body: JSON.stringify(body),
+    })
+      .then(async (r) => {
+        if (r.ok) {
+          nav("/");
+        } else {
+          const err = await r.json().catch(() => ({}));
+          throw new Error(err?.message || `Ошибка ${r.status}`);
+        }
+      })
+      .catch((e: Error) =>
+        setAlert({ open: true, severity: "error", message: e.message })
+      );
   };
 
   const handleCancel = () => {
@@ -29,6 +101,7 @@ function HomePage() {
     nav("/");
   };
 
+  /* ---------- стили ---------- */
   const formControlStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -36,23 +109,23 @@ function HomePage() {
       borderRadius: "16px",
       paddingRight: "8px",
     },
-    "& .MuiOutlinedInput-notchedOutline": {
-      borderColor: "#f0f0f0",
-    },
+    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#f0f0f0" },
     "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
       borderColor: "#59C36A",
     },
-    "& .MuiInputLabel-root": {
-      color: "#9e9e9e",
-    },
-    "& .Mui-focused .MuiInputLabel-root": {
-      color: "#59C36A",
-    },
-    "& svg": {
-      color: "#b0b0b0",
+    "& .MuiInputLabel-root": { color: "#9e9e9e" },
+    "& .Mui-focused .MuiInputLabel-root": { color: "#59C36A" },
+    "& svg": { color: "#b0b0b0" },
+  };
+
+  const selectMenuProps = {
+    PaperProps: { sx: { maxHeight: 48 * 6 } }, // 6 пунктов, далее scroll
+    MenuListProps: {
+      sx: { "&& .MuiMenuItem-root": { py: 0.5 } }, // уменьшить вертикальные отступы
     },
   };
 
+  /* ---------- разметка ---------- */
   return (
     <Box
       sx={{
@@ -71,6 +144,7 @@ function HomePage() {
           justifyContent: "center",
         }}
       >
+        {/* ---- ЗОНА ---- */}
         <FormControl fullWidth sx={formControlStyle} size="medium">
           <InputLabel id="zone-label">Зона</InputLabel>
           <Select
@@ -79,13 +153,17 @@ function HomePage() {
             label="Зона"
             onChange={(e: SelectChangeEvent) => setZone(e.target.value)}
             input={<OutlinedInput label="Зона" />}
+            MenuProps={selectMenuProps}
           >
-            <MenuItem value="">Select platform</MenuItem>
-            <MenuItem value="zone1">Зона 1</MenuItem>
-            <MenuItem value="zone2">Зона 2</MenuItem>
+            {zones.map((z) => (
+              <MenuItem key={z.id} value={z.id.toString()}>
+                {z.name}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
+        {/* ---- ТРАНСПОРТ ---- */}
         <FormControl fullWidth sx={formControlStyle} size="medium">
           <InputLabel id="vehicle-label">Транспортное средство</InputLabel>
           <Select
@@ -94,13 +172,17 @@ function HomePage() {
             label="Транспортное средство"
             onChange={(e: SelectChangeEvent) => setVehicle(e.target.value)}
             input={<OutlinedInput label="Транспортное средство" />}
+            MenuProps={selectMenuProps}
           >
-            <MenuItem value="">Select platform</MenuItem>
-            <MenuItem value="car">Машина</MenuItem>
-            <MenuItem value="bike">Велосипед</MenuItem>
+            {vehicles.map((v) => (
+              <MenuItem key={v.id} value={v.id.toString()}>
+                {v.license_plate}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
+        {/* ---- ТИП ---- */}
         <FormControl fullWidth sx={formControlStyle} size="medium">
           <InputLabel id="type-label">Тип</InputLabel>
           <Select
@@ -109,14 +191,15 @@ function HomePage() {
             label="Тип"
             onChange={(e: SelectChangeEvent) => setType(e.target.value)}
             input={<OutlinedInput label="Тип" />}
+            MenuProps={selectMenuProps}
           >
-            <MenuItem value="">Select platform</MenuItem>
-            <MenuItem value="hourly">Почасовая</MenuItem>
-            <MenuItem value="daily">Посуточная</MenuItem>
+            <MenuItem value="standard">standard</MenuItem>
+            <MenuItem value="advanced">advanced</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
+      {/* ---- КНОПКИ ---- */}
       <Box
         sx={{
           display: "flex",
@@ -142,6 +225,7 @@ function HomePage() {
             textTransform: "none",
             height: "48px",
           }}
+          disabled={!zone || !vehicle || !type}
         >
           Начать
         </Button>
@@ -161,6 +245,23 @@ function HomePage() {
           Отменить
         </Button>
       </Box>
+
+      {/* ---- ALERT ---- */}
+      <Snackbar
+        open={alert.open}
+        autoHideDuration={4000}
+        onClose={() => setAlert((a) => ({ ...a, open: false }))}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setAlert((a) => ({ ...a, open: false }))}
+          severity={alert.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {alert.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

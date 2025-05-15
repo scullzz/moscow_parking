@@ -1,11 +1,63 @@
-import { Box, Typography, Card, CardContent, Button } from "@mui/material";
+// ZonePage.tsx
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  CircularProgress,
+} from "@mui/material";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { tg } from "../../../main";
 
+/* ---------- типы из бекенда ---------- */
+interface Session {
+  id: number;
+  vehicle_id: number;
+  option_id: number;
+  parking_id: string;
+  start_time: string;
+  end_time: string;
+  duration: string;
+  type: "standard" | "advanced";
+  status: "active" | "completed";
+}
+
+interface User {
+  balance: number;
+}
+
+/* ---------- константы ---------- */
+const API = "https://api.projectdevdnkchain.ru";
+const headers = { auth: tg?.initData, accept: "application/json" };
+
+/* ---------- утилита ---------- */
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+    day: "2-digit",
+    month: "2-digit",
+  });
+
+/* ---------- карточка ---------- */
 const ZoneCard = ({
+  zone,
+  vehicle,
+  start,
+  end,
+  duration,
   showButton = false,
+  onFinish,
 }: {
-  completed?: boolean;
+  zone: string;
+  vehicle: string;
+  start: string;
+  end: string;
+  duration: string;
   showButton?: boolean;
+  onFinish?: () => void;
 }) => (
   <Card
     sx={{
@@ -14,14 +66,15 @@ const ZoneCard = ({
       mb: 2,
     }}
   >
-    <CardContent>
+    <CardContent sx={{ p: 2 }}>
       <Typography fontWeight="bold" sx={{ mb: 1 }}>
-        Зона:
+        Зона: {zone}
       </Typography>
-      <Typography variant="body2">🚗 Транспорт:</Typography>
-      <Typography variant="body2">📅 Начало:</Typography>
-      <Typography variant="body2">📅 Окончание:</Typography>
-      <Typography variant="body2">⏱️ Длительность:</Typography>
+      <Typography variant="body2">🚗 Транспорт: {vehicle}</Typography>
+      <Typography variant="body2">📅 Начало: {start}</Typography>
+      <Typography variant="body2">📅 Окончание: {end}</Typography>
+      <Typography variant="body2">⏱️ Длительность: {duration}</Typography>
+
       {showButton && (
         <Button
           variant="contained"
@@ -34,6 +87,7 @@ const ZoneCard = ({
             fontWeight: "bold",
             height: "30px",
           }}
+          onClick={onFinish}
         >
           Завершить
         </Button>
@@ -42,18 +96,57 @@ const ZoneCard = ({
   </Card>
 );
 
+/* ---------- страница ---------- */
 const ZonePage = () => {
   const nav = useNavigate();
 
+  const [active, setActive] = useState<Session[] | null>(null);
+  const [history, setHistory] = useState<Session[] | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
+
+  /* ------ загрузка данных ------ */
+  const loadData = () => {
+    Promise.all([
+      fetch(`${API}/users/me`, { headers }),
+      fetch(`${API}/parking/active`, { headers }),
+      fetch(`${API}/parking/history`, { headers }),
+    ])
+      .then(async ([u, a, h]) => {
+        if (u.ok) {
+          const user: User = await u.json();
+          setBalance(user.balance);
+        }
+        if (a.ok) setActive(await a.json());
+        if (h.ok) setHistory(await h.json());
+      })
+      .catch(console.error);
+  };
+
+  useEffect(loadData, []);
+
+  /* ------ завершение сессии ------ */
+  const endSession = async (sessionId: number) => {
+    const res = await fetch(`${API}/parking/end/${sessionId}`, {
+      method: "POST",
+      headers,
+    });
+    if (res.ok) loadData(); // перезагрузить баланс / активные / историю
+  };
+
+  /* ------ JSX ------ */
   return (
-    <Box sx={{ p: 2, pb: 16 }}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          mb: 2,
-        }}
-      >
+    <Box
+      sx={{
+        p: 2,
+        pb: 16,
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* баланс */}
+      <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
         <Box
           sx={{
             backgroundColor: "#fff",
@@ -61,32 +154,85 @@ const ZonePage = () => {
             py: 1,
             borderRadius: "999px",
             boxShadow: "0 0 8px rgba(0,0,0,0.1)",
-            display: "flex",
-            alignItems: "center",
             fontWeight: "bold",
             height: "30px",
+            display: "flex",
+            alignItems: "center",
           }}
         >
-          1000 🪙
+          {balance === null ? <CircularProgress size={18} /> : `${balance} 🪙`}
         </Box>
       </Box>
 
-      <ZoneCard />
-      <ZoneCard />
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          pr: 0.5,
+        }}
+      >
+        {history === null ? (
+          <CircularProgress
+            size={24}
+            sx={{ display: "block", mx: "auto", my: 4 }}
+          />
+        ) : history.length === 0 ? (
+          <Typography align="center" color="gray" sx={{ my: 2 }}>
+            История пуста
+          </Typography>
+        ) : (
+          history.map((s) => (
+            <ZoneCard
+              key={s.id}
+              zone={String(s.option_id)}
+              vehicle={String(s.vehicle_id)}
+              start={fmt(s.start_time)}
+              end={fmt(s.end_time)}
+              duration={s.duration}
+            />
+          ))
+        )}
+      </Box>
 
+      {/* ---------- АКТИВНЫЕ (фиксируются внизу) ---------- */}
       <Typography
         variant="body2"
         sx={{
           textAlign: "center",
-          my: 2,
+          mt: 2,
+          mb: 1,
           color: "gray",
           fontStyle: "italic",
         }}
       >
-        ------- Завершенные сегодня -------
+        ------- Активные зоны -------
       </Typography>
 
-      <ZoneCard showButton />
+      {active === null ? (
+        <CircularProgress
+          size={24}
+          sx={{ display: "block", mx: "auto", my: 2 }}
+        />
+      ) : active.length === 0 ? (
+        <Typography align="center" color="gray" sx={{ mb: 2 }}>
+          Нет активных сессий
+        </Typography>
+      ) : (
+        active.map((s) => (
+          <ZoneCard
+            key={s.id}
+            zone={String(s.option_id)}
+            vehicle={String(s.vehicle_id)}
+            start={fmt(s.start_time)}
+            end={fmt(s.end_time)}
+            duration={s.duration}
+            showButton
+            onFinish={() => endSession(s.id)}
+          />
+        ))
+      )}
+
+      {/* ---------- КНОПКА «АРЕНДОВАТЬ» ---------- */}
       <Box
         sx={{
           position: "fixed",
@@ -110,9 +256,7 @@ const ZonePage = () => {
             fontWeight: "bold",
             height: "48px",
           }}
-          onClick={() => {
-            nav("/list");
-          }}
+          onClick={() => nav("/list")}
         >
           + Арендовать парковку
         </Button>
