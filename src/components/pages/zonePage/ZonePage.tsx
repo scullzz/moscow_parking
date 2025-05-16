@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { tg } from "../../../main";
+import { tg } from "../../../main";
 
 /* ---------- типы из бекенда ---------- */
 interface Session {
@@ -134,6 +134,10 @@ const ZonePage = () => {
   };
 
   useEffect(loadData, []);
+
+  useEffect(() => {
+    alert(tg?.initData);
+  }, []);
 
   /* ------ завершение сессии ------ */
   const endSession = async (sessionId: number) => {
