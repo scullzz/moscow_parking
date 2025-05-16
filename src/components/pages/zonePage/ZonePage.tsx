@@ -28,10 +28,6 @@ interface User {
   balance: number;
 }
 
-/* ---------- константы ---------- */
-const API = "https://api.projectdevdnkchain.ru";
-const headers = { auth: tg?.initData, accept: "application/json" };
-
 /* ---------- утилита ---------- */
 const fmt = (iso: string) =>
   new Date(iso).toLocaleString("ru-RU", {
@@ -107,9 +103,24 @@ const ZonePage = () => {
   /* ------ загрузка данных ------ */
   const loadData = () => {
     Promise.all([
-      fetch(`${API}/users/me`, { headers }),
-      fetch(`${API}/parking/active`, { headers }),
-      fetch(`${API}/parking/history`, { headers }),
+      fetch(`https://api.projectdevdnkchain.ru/users/me`, {
+        headers: {
+          "Content-Type": "application/json",
+          auth: tg?.initData,
+        },
+      }),
+      fetch(`https://api.projectdevdnkchain.ru/parking/active`, {
+        headers: {
+          "Content-Type": "application/json",
+          auth: tg?.initData,
+        },
+      }),
+      fetch(`https://api.projectdevdnkchain.ru/parking/history`, {
+        headers: {
+          "Content-Type": "application/json",
+          auth: tg?.initData,
+        },
+      }),
     ])
       .then(async ([u, a, h]) => {
         if (u.ok) {
@@ -126,10 +137,16 @@ const ZonePage = () => {
 
   /* ------ завершение сессии ------ */
   const endSession = async (sessionId: number) => {
-    const res = await fetch(`${API}/parking/end/${sessionId}`, {
-      method: "POST",
-      headers,
-    });
+    const res = await fetch(
+      `https://api.projectdevdnkchain.ru/parking/end/${sessionId}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          auth: tg?.initData,
+        },
+      }
+    );
     if (res.ok) loadData(); // перезагрузить баланс / активные / историю
   };
 
