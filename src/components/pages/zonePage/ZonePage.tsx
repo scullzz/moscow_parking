@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { tg } from "../../../main";
+import { useTelegram } from "../../../utils/telegramHook";
 
 /* ---------- типы из бекенда ---------- */
 interface Session {
@@ -95,6 +95,7 @@ const ZoneCard = ({
 /* ---------- страница ---------- */
 const ZonePage = () => {
   const nav = useNavigate();
+  const tg = useTelegram();
 
   const [active, setActive] = useState<Session[] | null>(null);
   const [history, setHistory] = useState<Session[] | null>(null);
