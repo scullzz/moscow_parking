@@ -13,7 +13,7 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { tg } from "../../../main";
+// import { tg } from "../../../main";
 
 /* ---------- типы ---------- */
 interface ZoneOption {
@@ -46,14 +46,14 @@ function HomePage() {
 
   useEffect(() => {
     fetch("https://api.projectdevdnkchain.ru/parking/options", {
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
+      headers: { "Content-Type": "application/json", auth: "123" },
     })
       .then((r) => r.json())
       .then((d: ZoneOption[]) => setZones(d))
       .catch((e) => console.error("Zones error:", e));
 
     fetch("https://api.projectdevdnkchain.ru/vehicles/", {
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
+      headers: { "Content-Type": "application/json", auth: "123" },
     })
       .then((r) => r.json())
       .then((d: VehicleOption[]) => setVehicles(d))
@@ -72,7 +72,7 @@ function HomePage() {
 
     fetch("https://api.projectdevdnkchain.ru/parking/start", {
       method: "POST",
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
+      headers: { "Content-Type": "application/json", auth: "123" },
       body: JSON.stringify(body),
     })
       .then(async (r) => {

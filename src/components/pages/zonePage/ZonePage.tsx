@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { tg } from "../../../main";
+// import { tg } from "../../../main";
 
 /* ---------- типы из бекенда ---------- */
 interface Session {
@@ -106,19 +106,19 @@ const ZonePage = () => {
       fetch(`https://api.projectdevdnkchain.ru/users/me`, {
         headers: {
           "Content-Type": "application/json",
-          auth: tg?.initData,
+          auth: "123",
         },
       }),
       fetch(`https://api.projectdevdnkchain.ru/parking/active`, {
         headers: {
           "Content-Type": "application/json",
-          auth: tg?.initData,
+          auth: "123",
         },
       }),
       fetch(`https://api.projectdevdnkchain.ru/parking/history`, {
         headers: {
           "Content-Type": "application/json",
-          auth: tg?.initData,
+          auth: "123",
         },
       }),
     ])
@@ -143,16 +143,12 @@ const ZonePage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          auth: tg?.initData,
+          auth: "123",
         },
       }
     );
     if (res.ok) loadData(); // перезагрузить баланс / активные / историю
   };
-
-  useEffect(() => {
-    alert(tg.initData);
-  }, []);
 
   /* ------ JSX ------ */
   return (

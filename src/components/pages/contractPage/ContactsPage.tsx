@@ -1,7 +1,7 @@
 import { Box, List, ListItem, ListItemText, IconButton } from "@mui/material";
 import { ChevronRight } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-import { tg } from "../../../main";
+// import { tg } from "../../../main";
 
 interface IContact {
   title: string;
@@ -19,7 +19,7 @@ function ContactsPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            auth: tg?.initData,
+            auth: "123",
           },
         }
       );
@@ -32,7 +32,6 @@ function ContactsPage() {
   };
 
   useEffect(() => {
-    alert(tg.initData);
     getAllContacts();
   }, []);
 
