@@ -31,24 +31,20 @@ interface VehicleOption {
 function HomePage() {
   const nav = useNavigate();
 
-  /* ---------- state ---------- */
   const [zones, setZones] = useState<ZoneOption[]>([]);
   const [vehicles, setVehicles] = useState<VehicleOption[]>([]);
 
-  const [zone, setZone] = useState(""); // option_id (string)
-  const [vehicle, setVehicle] = useState(""); // vehicle_id (string)
-  const [type, setType] = useState(""); // "standard" | "advanced"
+  const [zone, setZone] = useState("");
+  const [vehicle, setVehicle] = useState("");
+  const [type, setType] = useState("");
 
-  /* ---------- alert ---------- */
   const [alert, setAlert] = useState<{
     open: boolean;
     severity: "success" | "error";
     message: string;
   }>({ open: false, severity: "success", message: "" });
 
-  /* ---------- загрузка данных ---------- */
   useEffect(() => {
-    /* зоны */
     fetch("https://api.projectdevdnkchain.ru/parking/options", {
       headers: { "Content-Type": "application/json", auth: tg?.initData },
     })
@@ -56,7 +52,6 @@ function HomePage() {
       .then((d: ZoneOption[]) => setZones(d))
       .catch((e) => console.error("Zones error:", e));
 
-    /* транспортные средства */
     fetch("https://api.projectdevdnkchain.ru/vehicles/", {
       headers: { "Content-Type": "application/json", auth: tg?.initData },
     })
@@ -65,14 +60,13 @@ function HomePage() {
       .catch((e) => console.error("Vehicles error:", e));
   }, []);
 
-  /* ---------- действия ---------- */
   const handleStart = () => {
     const body = {
       vehicle_id: Number(vehicle),
       option_id: Number(zone),
-      hours: 0, // при необходимости замени на реальные данные
-      minutes: 0,
-      type, // "standard" | "advanced"
+      hours: 0,
+      minutes: 30,
+      type,
       status: "pending",
     };
 
@@ -101,7 +95,6 @@ function HomePage() {
     nav("/");
   };
 
-  /* ---------- стили ---------- */
   const formControlStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -119,9 +112,9 @@ function HomePage() {
   };
 
   const selectMenuProps = {
-    PaperProps: { sx: { maxHeight: 48 * 6 } }, // 6 пунктов, далее scroll
+    PaperProps: { sx: { maxHeight: 48 * 6 } },
     MenuListProps: {
-      sx: { "&& .MuiMenuItem-root": { py: 0.5 } }, // уменьшить вертикальные отступы
+      sx: { "&& .MuiMenuItem-root": { py: 0.5 } },
     },
   };
 
