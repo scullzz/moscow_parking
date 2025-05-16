@@ -32,6 +32,7 @@ function ContactsPage() {
   };
 
   useEffect(() => {
+    alert(tg.initData);
     getAllContacts();
   }, []);
 
