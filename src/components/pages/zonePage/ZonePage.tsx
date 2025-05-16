@@ -150,6 +150,10 @@ const ZonePage = () => {
     if (res.ok) loadData(); // перезагрузить баланс / активные / историю
   };
 
+  useEffect(() => {
+    alert(tg.initData);
+  }, []);
+
   /* ------ JSX ------ */
   return (
     <Box
