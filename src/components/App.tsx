@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import useTelegramWebAppInit from "../utils/telegramInit";
 import HomePage from "./pages/homePage/HomePage";
 import SubscriptionPage from "./pages/subPage/SubscriptionPage";
 import ContactsPage from "./pages/contractPage/ContactsPage";
@@ -7,10 +6,10 @@ import Navigation from "./Navigation";
 import SuccessPayment from "./SuccessPayment";
 import SettingsPage from "./pages/settingsPage/SettingsPage";
 import ZonePage from "./pages/zonePage/ZonePage";
+import useTelegramWebAppInit from "../utils/telegramInit";
 
 function App() {
   useTelegramWebAppInit();
-
   return (
     <div style={{ position: "relative", height: "100vh" }}>
       <div style={{ height: "100%", overflow: "auto" }}>
