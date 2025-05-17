@@ -228,7 +228,7 @@ const ZonePage = () => {
           fontStyle: "italic",
         }}
       >
-        {tg.initData}
+        {tg?.initData}
         ------- Активные зоны -------
       </Typography>
 
