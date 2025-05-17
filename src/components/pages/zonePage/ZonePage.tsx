@@ -139,7 +139,7 @@ const ZonePage = () => {
   useEffect(() => {
     if (!tg) return; // ждём, пока hook положит WebApp
     alert(tg.initData || "(пусто)");
-  }, [tg]);
+  }, []);
 
   /* ------ завершение сессии ------ */
   const endSession = async (sessionId: number) => {
