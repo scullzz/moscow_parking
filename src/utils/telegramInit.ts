@@ -1,23 +1,42 @@
-import { useEffect } from "react";
+import { useLayoutEffect, useState } from "react";
 
-function useTelegramWebAppInit() {
-  useEffect(() => {
-    const tg = window.Telegram?.WebApp;
-    if (!tg) return;
-    tg.expand();
-    // tg.requestFullscreen();
+export default function useTelegramWebAppInit() {
+  const [tg, setTg] = useState(() => window.Telegram?.WebApp ?? null);
 
-    tg.MainButton?.setParams({
-      text: "Сохранить",
-      color: "#FFFFFF",
-      text_color: "#000000",
-    });
+  useLayoutEffect(() => {
+    // если объект уже есть
+    if (tg) {
+      tg.expand();
+      tg.setBackgroundColor("#FFFFFF");
+      tg.setHeaderColor("#229ED9");
+      tg.MainButton?.setParams({
+        text: "Сохранить",
+        color: "#FFFFFF",
+        text_color: "#000",
+      });
+      tg.MainButton?.hide();
+      return;
+    }
 
-    tg.MainButton?.hide();
+    // если скрипт ещё не успел инициализироваться
+    function onLoad() {
+      const webApp = window.Telegram?.WebApp;
+      if (webApp) {
+        setTg(webApp);
+        tg.expand();
+        tg.setBackgroundColor("#FFFFFF");
+        tg.setHeaderColor("#229ED9");
+        tg.MainButton?.setParams({
+          text: "Сохранить",
+          color: "#FFFFFF",
+          text_color: "#000",
+        });
+        tg.MainButton?.hide();
+      }
+    }
 
-    tg.setBackgroundColor("#FFFFFF");
-    tg.setHeaderColor("#229ED9");
-  }, []);
+    // ждём полной загрузки DOM или скрипта
+    window.addEventListener("load", onLoad);
+    return () => window.removeEventListener("load", onLoad);
+  }, [tg]);
 }
-
-export default useTelegramWebAppInit;
