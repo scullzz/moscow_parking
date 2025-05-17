@@ -34,8 +34,8 @@ export interface IActiveSubscription {
 
 function SubscriptionPage() {
   const [tariffs, setTariffs] = useState<ITariff[]>([]);
-  const [activeSubscriptions, setActiveSubscriptions] =
-    useState<IActiveSubscription>();
+  const [activeSubscription, setActiveSubscription] =
+    useState<IActiveSubscription | null>(null);
 
   const getAllTariffs = async () => {
     try {
@@ -59,7 +59,7 @@ function SubscriptionPage() {
 
   const getActiveSubscription = async () => {
     try {
-      const response = await fetch(
+      const r = await fetch(
         "https://api.projectdevdnkchain.ru/subscription/active",
         {
           method: "GET",
@@ -70,10 +70,18 @@ function SubscriptionPage() {
         }
       );
 
-      const res = await response.json();
-      setActiveSubscriptions(res);
+      // back-end иногда шлёт 200 c `{ detail: "Подписка не найдена" }`
+      const data = await r.json();
+
+      // если detail есть — значит подписки нет
+      if (!r.ok || (data && "detail" in data)) {
+        setActiveSubscription(null);
+      } else {
+        setActiveSubscription(data as IActiveSubscription);
+      }
     } catch (err) {
       console.log(err);
+      setActiveSubscription(null); // на всякий случай
     }
   };
 
@@ -82,7 +90,7 @@ function SubscriptionPage() {
     getActiveSubscription();
   }, []);
 
-  const activeSubscription = async (id: number) => {
+  const activateSubscription = async (id: number) => {
     try {
       const response = await fetch(
         "https://api.projectdevdnkchain.ru/payhistory/create",
@@ -110,7 +118,7 @@ function SubscriptionPage() {
 
   return (
     <Box sx={{ padding: 2 }}>
-      {activeSubscriptions && (
+      {activeSubscription && (
         <Card
           sx={{
             borderRadius: "16px",
@@ -127,15 +135,15 @@ function SubscriptionPage() {
               }}
             >
               <Typography variant="h6" fontWeight="bold">
-                {activeSubscriptions.tariff.name}
+                {activeSubscription.tariff.name}
               </Typography>
-              <Typography>{activeSubscriptions.tariff.description}</Typography>
+              <Typography>{activeSubscription.tariff.description}</Typography>
             </div>
             <Typography variant="body2" sx={{ display: "flex", gap: 1 }}>
-              💎 <b>Стоимость:</b> {activeSubscriptions.tariff.price} ₽
+              💎 <b>Стоимость:</b> {activeSubscription.tariff.price} ₽
             </Typography>
             <Typography variant="body2" sx={{ display: "flex", gap: 1 }}>
-              📅 <b>Длительность:</b> {activeSubscriptions.tariff.days_count}{" "}
+              📅 <b>Длительность:</b> {activeSubscription.tariff.days_count}{" "}
               дней
             </Typography>
             <Button
@@ -153,7 +161,7 @@ function SubscriptionPage() {
             >
               Активно до{" "}
               {format(
-                parseISO(activeSubscriptions.subscription_end),
+                parseISO(activeSubscription.subscription_end),
                 "dd.MM.yyyy"
               )}
             </Button>
@@ -213,7 +221,7 @@ function SubscriptionPage() {
                 },
                 fontWeight: "bold",
               }}
-              onClick={() => activeSubscription(+t.id)}
+              onClick={() => activateSubscription(+t.id)}
             >
               Активировать
             </Button>

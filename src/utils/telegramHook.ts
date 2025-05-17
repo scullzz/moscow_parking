@@ -1,17 +1,22 @@
 // src/lib/useTelegram.ts
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
-export type TelegramWebApp = typeof window.Telegram.WebApp | null;
+export function useTelegram() {
+  // «Ленивая» инициализация: пробуем взять WebApp ещё до первого рендера
+  const [tg, setTg] = useState(() => window.Telegram?.WebApp ?? null);
 
-export function useTelegram(): TelegramWebApp {
-  const [tg, setTg] = useState<TelegramWebApp>(null);
-
-  useEffect(() => {
-    // ждём появления объекта во view Telegram
-    const webApp = window.Telegram?.WebApp ?? null;
-    if (webApp) webApp.ready(); // рекомендует сам Telegram
-    setTg(webApp);
-  }, []);
+  useLayoutEffect(() => {
+    if (tg) {
+      tg.ready(); // рекомендация Telegram
+      return;
+    }
+    // Если пришли сюда, значит WebApp появился позже (iOS / старые Android)
+    const webApp = window.Telegram?.WebApp;
+    if (webApp) {
+      webApp.ready();
+      setTg(webApp);
+    }
+  }, [tg]);
 
   return tg;
 }
