@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Typography, Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import { format, parseISO } from "date-fns";
-// import { tg } from "../../../main";
+import { useTelegram } from "../../../utils/telegramHook";
 
 interface ITariff {
   id: string;
@@ -33,6 +33,7 @@ export interface IActiveSubscription {
 }
 
 function SubscriptionPage() {
+  const tg = useTelegram();
   const [tariffs, setTariffs] = useState<ITariff[]>([]);
   const [activeSubscription, setActiveSubscription] =
     useState<IActiveSubscription | null>(null);
@@ -45,7 +46,7 @@ function SubscriptionPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            auth: "123",
+            auth: tg?.initData,
           },
         }
       );
@@ -64,7 +65,7 @@ function SubscriptionPage() {
         {
           method: "GET",
           headers: {
-            auth: "123",
+            auth: tg?.initData,
             "Content-Type": "application/json",
           },
         }
@@ -98,7 +99,7 @@ function SubscriptionPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            auth: "123",
+            auth: tg?.initData,
           },
           body: JSON.stringify({
             tariff_id: id,

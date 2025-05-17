@@ -1,7 +1,7 @@
 import { Box, List, ListItem, ListItemText, IconButton } from "@mui/material";
 import { ChevronRight } from "@mui/icons-material";
 import { useEffect, useState } from "react";
-// import { tg } from "../../../main";
+import { useTelegram } from "../../../utils/telegramHook";
 
 interface IContact {
   title: string;
@@ -9,6 +9,7 @@ interface IContact {
 }
 
 function ContactsPage() {
+  const tg = useTelegram();
   const [items, setItems] = useState<IContact[]>([]);
 
   const getAllContacts = async () => {
@@ -19,7 +20,7 @@ function ContactsPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            auth: "123",
+            auth: tg?.initData,
           },
         }
       );

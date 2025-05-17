@@ -2,9 +2,10 @@
 import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { useTelegram } from "../utils/telegramHook";
 
 function Header() {
-  const tg = window.Telegram?.WebApp;
+  const tg = useTelegram();
 
   const handleClose = () => {
     tg?.close();

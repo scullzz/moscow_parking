@@ -13,9 +13,8 @@ import {
   Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-// import { tg } from "../../../main";
+import { useTelegram } from "../../../utils/telegramHook";
 
-/* ---------- типы ---------- */
 interface ZoneOption {
   id: number;
   zone_id: string;
@@ -30,6 +29,7 @@ interface VehicleOption {
 
 function HomePage() {
   const nav = useNavigate();
+  const tg = useTelegram();
 
   const [zones, setZones] = useState<ZoneOption[]>([]);
   const [vehicles, setVehicles] = useState<VehicleOption[]>([]);
@@ -46,14 +46,14 @@ function HomePage() {
 
   useEffect(() => {
     fetch("https://api.projectdevdnkchain.ru/parking/options", {
-      headers: { "Content-Type": "application/json", auth: "123" },
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
     })
       .then((r) => r.json())
       .then((d: ZoneOption[]) => setZones(d))
       .catch((e) => console.error("Zones error:", e));
 
     fetch("https://api.projectdevdnkchain.ru/vehicles/", {
-      headers: { "Content-Type": "application/json", auth: "123" },
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
     })
       .then((r) => r.json())
       .then((d: VehicleOption[]) => setVehicles(d))
@@ -72,7 +72,7 @@ function HomePage() {
 
     fetch("https://api.projectdevdnkchain.ru/parking/start", {
       method: "POST",
-      headers: { "Content-Type": "application/json", auth: "123" },
+      headers: { "Content-Type": "application/json", auth: tg?.initData },
       body: JSON.stringify(body),
     })
       .then(async (r) => {
