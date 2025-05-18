@@ -137,8 +137,7 @@ const ZonePage = () => {
   useEffect(loadData, []);
 
   useEffect(() => {
-    if (!tg) return; // ждём, пока hook положит WebApp
-    alert(tg.initData || "(пусто)");
+    if (!tg) return;
   }, []);
 
   /* ------ завершение сессии ------ */
@@ -228,7 +227,6 @@ const ZonePage = () => {
           fontStyle: "italic",
         }}
       >
-        {tg?.initData}
         ------- Активные зоны -------
       </Typography>
 
