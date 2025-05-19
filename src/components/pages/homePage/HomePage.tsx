@@ -37,6 +37,9 @@ function HomePage() {
   const [vehicle, setVehicle] = useState("");
   const [type, setType] = useState("");
 
+  const [login, setLogin] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
   const [alert, setAlert] = useState<{
     open: boolean;
     severity: "success" | "error";
@@ -45,6 +48,21 @@ function HomePage() {
 
   useEffect(() => {
     const fetchData = async () => {
+      try {
+        // Загрузка данных логина и пароля
+        const r = await fetch("https://api.projectdevdnkchain.ru/users/me", {
+          method: "GET",
+          headers: { "Content-Type": "application/json", auth: tg?.initData },
+        });
+        const res = await r.json();
+
+        setLogin(res.website_login ?? "");
+        setPassword(res.website_password ?? "");
+      } catch (e) {
+        console.error("Ошибка загрузки данных пользователя:", e);
+      }
+
+      // Загрузка данных зон и транспортных средств
       try {
         const zoneResponse = await fetch(
           "https://api.projectdevdnkchain.ru/parking/options",
@@ -80,6 +98,16 @@ function HomePage() {
   }, [tg?.initData]);
 
   const handleStart = () => {
+    // Проверка на наличие логина и пароля перед началом действия
+    if (!login || !password) {
+      setAlert({
+        open: true,
+        severity: "error",
+        message: "Вы должны сначала авторизоваться, прежде чем начать!",
+      });
+      return;
+    }
+
     const body = {
       vehicle_id: Number(vehicle),
       option_id: Number(zone),
@@ -137,7 +165,6 @@ function HomePage() {
     },
   };
 
-  /* ---------- разметка ---------- */
   return (
     <Box
       sx={{
