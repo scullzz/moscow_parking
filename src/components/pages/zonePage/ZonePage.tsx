@@ -107,19 +107,19 @@ const ZonePage = () => {
       fetch(`https://api.projectdevdnkchain.ru/users/me`, {
         headers: {
           "Content-Type": "application/json",
-          auth: "123",
+          auth: tg?.initData,
         },
       }),
       fetch(`https://api.projectdevdnkchain.ru/parking/active`, {
         headers: {
           "Content-Type": "application/json",
-          auth: "123",
+          auth: tg?.initData,
         },
       }),
       fetch(`https://api.projectdevdnkchain.ru/parking/history`, {
         headers: {
           "Content-Type": "application/json",
-          auth: "123",
+          auth: tg?.initData,
         },
       }),
     ])
@@ -148,7 +148,7 @@ const ZonePage = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          auth: "123",
+          auth: tg?.initData,
         },
       }
     );

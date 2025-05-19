@@ -16,19 +16,22 @@ const SuccessPayment = () => {
   useEffect(() => {
     const fetchPaymentStatus = async () => {
       try {
-        const auth = "123";
+        const auth = tg?.initData;
 
-        const lastRes = await fetch("https://api.a-b-d.ru/payhistory/last", {
-          headers: {
-            accept: "application/json",
-            auth,
-          },
-        });
+        const lastRes = await fetch(
+          "https://api.projectdevdnkchain.ru/payhistory/last",
+          {
+            headers: {
+              accept: "application/json",
+              auth,
+            },
+          }
+        );
         const lastData = await lastRes.json();
         const invoiceId = lastData.invoice_id;
 
         const checkRes = await fetch(
-          `https://api.a-b-d.ru/payhistory/check/${invoiceId}`,
+          `https://api.projectdevdnkchain.ru/payhistory/check/${invoiceId}`,
           {
             headers: {
               accept: "application/json",
