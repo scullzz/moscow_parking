@@ -46,7 +46,7 @@ const SettingsPage = () => {
     try {
       const r = await fetch("https://api.projectdevdnkchain.ru/users/me", {
         method: "GET",
-        headers: { "Content-Type": "application/json", auth: tg?.initData },
+        headers: { "Content-Type": "application/json", auth: "123" },
       });
       const res = await r.json();
 
@@ -65,7 +65,7 @@ const SettingsPage = () => {
     try {
       await fetch("https://api.projectdevdnkchain.ru/users/me", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", auth: tg?.initData },
+        headers: { "Content-Type": "application/json", auth: "123" },
         body: JSON.stringify({
           website_login: login,
           website_password: password,

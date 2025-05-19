@@ -52,7 +52,7 @@ function HomePage() {
         // Загрузка данных логина и пароля
         const r = await fetch("https://api.projectdevdnkchain.ru/users/me", {
           method: "GET",
-          headers: { "Content-Type": "application/json", auth: tg?.initData },
+          headers: { "Content-Type": "application/json", auth: "123" },
         });
         const res = await r.json();
 
@@ -67,7 +67,7 @@ function HomePage() {
         const zoneResponse = await fetch(
           "https://api.projectdevdnkchain.ru/parking/options",
           {
-            headers: { "Content-Type": "application/json", auth: tg?.initData },
+            headers: { "Content-Type": "application/json", auth: "123" },
           }
         );
         if (!zoneResponse.ok) throw new Error("Не удалось загрузить зоны");
@@ -77,7 +77,7 @@ function HomePage() {
         const vehicleResponse = await fetch(
           "https://api.projectdevdnkchain.ru/vehicles/",
           {
-            headers: { "Content-Type": "application/json", auth: tg?.initData },
+            headers: { "Content-Type": "application/json", auth: "123" },
           }
         );
         if (!vehicleResponse.ok)
@@ -95,7 +95,7 @@ function HomePage() {
     };
 
     fetchData();
-  }, [tg?.initData]);
+  }, ["123"]);
 
   const handleStart = () => {
     // Проверка на наличие логина и пароля перед началом действия
@@ -119,7 +119,7 @@ function HomePage() {
 
     fetch("https://api.projectdevdnkchain.ru/parking/start", {
       method: "POST",
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
+      headers: { "Content-Type": "application/json", auth: "123" },
       body: JSON.stringify(body),
     })
       .then(async (r) => {

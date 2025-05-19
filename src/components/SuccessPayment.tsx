@@ -16,7 +16,7 @@ const SuccessPayment = () => {
   useEffect(() => {
     const fetchPaymentStatus = async () => {
       try {
-        const auth = tg?.initData;
+        const auth = "123";
 
         const lastRes = await fetch("https://api.a-b-d.ru/payhistory/last", {
           headers: {

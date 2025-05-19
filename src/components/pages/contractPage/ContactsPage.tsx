@@ -20,7 +20,7 @@ function ContactsPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            auth: tg?.initData,
+            auth: "123",
           },
         }
       );

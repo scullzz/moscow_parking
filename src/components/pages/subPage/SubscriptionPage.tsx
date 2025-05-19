@@ -46,7 +46,7 @@ function SubscriptionPage() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            auth: tg?.initData,
+            auth: "123",
           },
         }
       );
@@ -65,7 +65,7 @@ function SubscriptionPage() {
         {
           method: "GET",
           headers: {
-            auth: tg?.initData,
+            auth: "123",
             "Content-Type": "application/json",
           },
         }
@@ -99,7 +99,7 @@ function SubscriptionPage() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            auth: tg?.initData,
+            auth: "123",
           },
           body: JSON.stringify({
             tariff_id: id,
