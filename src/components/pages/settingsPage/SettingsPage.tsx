@@ -153,6 +153,7 @@ const SettingsPage = () => {
         }}
         sx={inputStyle}
         size="medium"
+        type="number"
       />
 
       <TextField
@@ -165,6 +166,7 @@ const SettingsPage = () => {
         }}
         sx={inputStyle}
         size="medium"
+        type="number"
       />
 
       {dirty && (

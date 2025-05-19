@@ -1,4 +1,3 @@
-// HomePage.tsx
 import { useEffect, useState } from "react";
 import {
   Box,
@@ -45,20 +44,40 @@ function HomePage() {
   }>({ open: false, severity: "success", message: "" });
 
   useEffect(() => {
-    fetch("https://api.projectdevdnkchain.ru/parking/options", {
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
-    })
-      .then((r) => r.json())
-      .then((d: ZoneOption[]) => setZones(d))
-      .catch((e) => console.error("Zones error:", e));
+    const fetchData = async () => {
+      try {
+        const zoneResponse = await fetch(
+          "https://api.projectdevdnkchain.ru/parking/options",
+          {
+            headers: { "Content-Type": "application/json", auth: tg?.initData },
+          }
+        );
+        if (!zoneResponse.ok) throw new Error("Не удалось загрузить зоны");
+        const zoneData: ZoneOption[] = await zoneResponse.json();
+        setZones(zoneData);
 
-    fetch("https://api.projectdevdnkchain.ru/vehicles/", {
-      headers: { "Content-Type": "application/json", auth: tg?.initData },
-    })
-      .then((r) => r.json())
-      .then((d: VehicleOption[]) => setVehicles(d))
-      .catch((e) => console.error("Vehicles error:", e));
-  }, []);
+        const vehicleResponse = await fetch(
+          "https://api.projectdevdnkchain.ru/vehicles/",
+          {
+            headers: { "Content-Type": "application/json", auth: tg?.initData },
+          }
+        );
+        if (!vehicleResponse.ok)
+          throw new Error("Не удалось загрузить транспорт");
+        const vehicleData: VehicleOption[] = await vehicleResponse.json();
+        setVehicles(vehicleData);
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+        setAlert({
+          open: true,
+          severity: "error",
+          message: "Не удалось загрузить данные",
+        });
+      }
+    };
+
+    fetchData();
+  }, [tg?.initData]);
 
   const handleStart = () => {
     const body = {
@@ -148,11 +167,15 @@ function HomePage() {
             input={<OutlinedInput label="Зона" />}
             MenuProps={selectMenuProps}
           >
-            {zones.map((z) => (
-              <MenuItem key={z.id} value={z.id.toString()}>
-                {z.name}
-              </MenuItem>
-            ))}
+            {zones.length === 0 ? (
+              <MenuItem disabled>Нет доступных зон</MenuItem>
+            ) : (
+              zones.map((z) => (
+                <MenuItem key={z.id} value={z.id.toString()}>
+                  {z.name}
+                </MenuItem>
+              ))
+            )}
           </Select>
         </FormControl>
 
@@ -167,11 +190,15 @@ function HomePage() {
             input={<OutlinedInput label="Транспортное средство" />}
             MenuProps={selectMenuProps}
           >
-            {vehicles.map((v) => (
-              <MenuItem key={v.id} value={v.id.toString()}>
-                {v.license_plate}
-              </MenuItem>
-            ))}
+            {vehicles.length === 0 ? (
+              <MenuItem disabled>Нет доступных транспортных средств</MenuItem>
+            ) : (
+              vehicles.map((v) => (
+                <MenuItem key={v.id} value={v.id.toString()}>
+                  {v.license_plate}
+                </MenuItem>
+              ))
+            )}
           </Select>
         </FormControl>
 
