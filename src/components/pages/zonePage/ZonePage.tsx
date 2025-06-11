@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTelegram } from "../../../utils/telegramHook";
+import coin from "./image/coin.png";
 
 /* ---------- типы из бекенда ---------- */
 interface Session {
@@ -182,7 +183,13 @@ const ZonePage = () => {
             alignItems: "center",
           }}
         >
-          {balance === null ? <CircularProgress size={18} /> : `${balance} 🪙`}
+          {balance === null ? (
+            <CircularProgress size={18} />
+          ) : (
+            <>
+              {balance} <img width={15} src={coin} alt="🪙" />
+            </>
+          )}
         </Box>
       </Box>
 
