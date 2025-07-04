@@ -10,6 +10,8 @@ import {
   SelectChangeEvent,
   Snackbar,
   Alert,
+  Autocomplete,
+  TextField,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTelegram } from "../../../utils/telegramHook";
@@ -33,9 +35,9 @@ function HomePage() {
   const [zones, setZones] = useState<ZoneOption[]>([]);
   const [vehicles, setVehicles] = useState<VehicleOption[]>([]);
 
-  const [zone, setZone] = useState("");
-  const [vehicle, setVehicle] = useState("");
-  const [type, setType] = useState("");
+  const [zone, setZone] = useState<string>("");
+  const [vehicle, setVehicle] = useState<string>("");
+  const [type, setType] = useState<string>("");
 
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -46,24 +48,24 @@ function HomePage() {
     message: string;
   }>({ open: false, severity: "success", message: "" });
 
+  /* ---------------- fetch ---------------- */
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Загрузка данных логина и пароля
+        // user data
         const r = await fetch("https://api.projectdevdnkchain.ru/users/me", {
           method: "GET",
           headers: { "Content-Type": "application/json", auth: tg?.initData },
         });
         const res = await r.json();
-
         setLogin(res.website_login ?? "");
         setPassword(res.website_password ?? "");
       } catch (e) {
         console.error("Ошибка загрузки данных пользователя:", e);
       }
 
-      // Загрузка данных зон и транспортных средств
       try {
+        // zones
         const zoneResponse = await fetch(
           "https://api.projectdevdnkchain.ru/parking/options",
           {
@@ -74,6 +76,7 @@ function HomePage() {
         const zoneData: ZoneOption[] = await zoneResponse.json();
         setZones(zoneData);
 
+        // vehicles
         const vehicleResponse = await fetch(
           "https://api.projectdevdnkchain.ru/vehicles/",
           {
@@ -97,8 +100,8 @@ function HomePage() {
     fetchData();
   }, [tg?.initData]);
 
+  /* ---------------- handlers ---------------- */
   const handleStart = () => {
-    // Проверка на наличие логина и пароля перед началом действия
     if (!login || !password) {
       setAlert({
         open: true,
@@ -142,6 +145,7 @@ function HomePage() {
     nav("/");
   };
 
+  /* ---------------- styles ---------------- */
   const formControlStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -156,7 +160,28 @@ function HomePage() {
     "& .MuiInputLabel-root": { color: "#9e9e9e" },
     "& .Mui-focused .MuiInputLabel-root": { color: "#59C36A" },
     "& svg": { color: "#b0b0b0" },
-  };
+  } as const;
+
+  const autocompleteStyle = {
+    mb: 2,
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "#fff",
+      borderRadius: "16px",
+    },
+    "& .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#f0f0f0",
+    },
+    "& .Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "#59C36A",
+    },
+    "& .MuiInputLabel-root": {
+      color: "#9e9e9e",
+    },
+    "& .Mui-focused .MuiInputLabel-root": {
+      color: "#59C36A",
+    },
+    "& svg": { color: "#b0b0b0" },
+  } as const;
 
   const selectMenuProps = {
     PaperProps: { sx: { maxHeight: 48 * 6 } },
@@ -165,6 +190,7 @@ function HomePage() {
     },
   };
 
+  /* ---------------- jsx ---------------- */
   return (
     <Box
       sx={{
@@ -183,28 +209,26 @@ function HomePage() {
           justifyContent: "center",
         }}
       >
-        {/* ---- ЗОНА ---- */}
-        <FormControl fullWidth sx={formControlStyle} size="medium">
-          <InputLabel id="zone-label">Зона</InputLabel>
-          <Select
-            labelId="zone-label"
-            value={zone}
-            label="Зона"
-            onChange={(e: SelectChangeEvent) => setZone(e.target.value)}
-            input={<OutlinedInput label="Зона" />}
-            MenuProps={selectMenuProps}
-          >
-            {zones.length === 0 ? (
-              <MenuItem disabled>Нет доступных зон</MenuItem>
-            ) : (
-              zones.map((z) => (
-                <MenuItem key={z.id} value={z.id.toString()}>
-                  {z.name}
-                </MenuItem>
-              ))
-            )}
-          </Select>
-        </FormControl>
+        {/* ---- ЗОНА (с поиском) ---- */}
+        <Autocomplete
+          options={zones}
+          noOptionsText="Нет доступных зон"
+          getOptionLabel={(opt) => opt.name}
+          isOptionEqualToValue={(o, v) => o.id === v.id}
+          value={zones.find((z) => z.id.toString() === zone) || null}
+          onChange={(e, newValue) =>
+            setZone(newValue ? newValue.id.toString() : "")
+          }
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Парковка №"
+              variant="outlined"
+              size="medium"
+            />
+          )}
+          sx={autocompleteStyle}
+        />
 
         {/* ---- ТРАНСПОРТ ---- */}
         <FormControl fullWidth sx={formControlStyle} size="medium">
@@ -229,24 +253,24 @@ function HomePage() {
           </Select>
         </FormControl>
 
-        {/* ---- ТИП ---- */}
+        {/* ---- РЕЖИМ ---- */}
         <FormControl fullWidth sx={formControlStyle} size="medium">
-          <InputLabel id="type-label">Тип</InputLabel>
+          <InputLabel id="type-label">Режим</InputLabel>
           <Select
             labelId="type-label"
             value={type}
-            label="Тип"
+            label="Режим"
             onChange={(e: SelectChangeEvent) => setType(e.target.value)}
-            input={<OutlinedInput label="Тип" />}
+            input={<OutlinedInput label="Режим" />}
             MenuProps={selectMenuProps}
           >
-            <MenuItem value="standard">standard</MenuItem>
-            <MenuItem value="advanced">advanced</MenuItem>
+            <MenuItem value="standard">Стандартный</MenuItem>
+            <MenuItem value="advanced">Периодичный</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
-      {/* ---- КНОПКИ ---- */}
+      {/* ---- BUTTONS ---- */}
       <Box
         sx={{
           display: "flex",

@@ -7,7 +7,7 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTelegram } from "../../../utils/telegramHook";
 import coin from "./image/coin.png";
@@ -21,6 +21,8 @@ interface Session {
   start_time: string;
   end_time: string;
   duration: string;
+  option_name: string;
+  license_plate: string;
   type: "standard" | "advanced";
   status: "active" | "completed";
 }
@@ -85,7 +87,6 @@ const ZoneCard = ({
   </Card>
 );
 
-/* ---------- страница ---------- */
 const ZonePage = () => {
   const nav = useNavigate();
   const tg = useTelegram();
@@ -94,7 +95,9 @@ const ZonePage = () => {
   const [history, setHistory] = useState<Session[] | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
 
-  /* ------ загрузка данных ------ */
+  // Ref на скроллбокс
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+
   const loadData = () => {
     Promise.all([
       fetch("https://api.projectdevdnkchain.ru/users/me", {
@@ -115,6 +118,14 @@ const ZonePage = () => {
       .catch(console.error);
   };
   useEffect(loadData, []);
+
+  /* ------ автоскролл вниз при загрузке / обновлении данных ------ */
+  useEffect(() => {
+    if (scrollRef.current) {
+      // Прокрутить в самый низ без анимации
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [active, history]);
 
   /* ------ завершение сессии ------ */
   const endSession = async (id: number) => {
@@ -167,7 +178,7 @@ const ZonePage = () => {
       </Box>
 
       {/* -------- ОДИН скролл -------- */}
-      <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 0.5 }}>
+      <Box ref={scrollRef} sx={{ flexGrow: 1, overflowY: "auto", pr: 0.5 }}>
         {/* история */}
         {history === null ? (
           <CircularProgress
@@ -182,8 +193,8 @@ const ZonePage = () => {
           history.map((s) => (
             <ZoneCard
               key={s.id}
-              zone={String(s.option_id)}
-              vehicle={String(s.vehicle_id)}
+              zone={String(s.option_name)}
+              vehicle={String(s.license_plate)}
               start={fmt(s.start_time)}
               end={fmt(s.end_time)}
               duration={s.duration}

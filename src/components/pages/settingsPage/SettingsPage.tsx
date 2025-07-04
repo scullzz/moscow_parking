@@ -10,6 +10,19 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTelegram } from "../../../utils/telegramHook";
 
+const minutesToHMS = (m: number | "") => {
+  if (m === "") return "00:00:00";
+  const h = Math.floor(+m / 60);
+  const mm = +m % 60;
+  return `${String(h).padStart(2, "0")}:${String(mm).padStart(2, "0")}:00`;
+};
+
+const HMSToMinutes = (t: string) => {
+  const [h = "0", m = "0", s = "0"] = t.split(":");
+  const base = Number(h) * 60 + Number(m);
+  return Number(s) >= 30 ? base + 1 : base;
+};
+
 const inputStyle = {
   mb: 2,
   "& .MuiOutlinedInput-root": {
@@ -36,8 +49,14 @@ const SettingsPage = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [completeAfterPayment, setCompleteAfterPayment] = useState("");
-  const [registerAfterComplete, setRegisterAfterComplete] = useState("");
+
+  /** минуты в стейте, строка-время в интерфейсе */
+  const [completeAfterPayment, setCompleteAfterPayment] = useState<number | "">(
+    ""
+  );
+  const [registerAfterComplete, setRegisterAfterComplete] = useState<
+    number | ""
+  >("");
 
   const [dirty, setDirty] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -69,8 +88,8 @@ const SettingsPage = () => {
         body: JSON.stringify({
           website_login: login,
           website_password: password,
-          complete_after_payment: completeAfterPayment,
-          reissue_after_completion: registerAfterComplete,
+          complete_after_payment: completeAfterPayment || 0,
+          reissue_after_completion: registerAfterComplete || 0,
         }),
       });
       setDirty(false);
@@ -109,65 +128,92 @@ const SettingsPage = () => {
         px: 3,
       }}
     >
-      <TextField
-        label="Логин"
-        fullWidth
-        value={login}
-        onChange={(e) => {
-          setLogin(e.target.value);
-          setDirty(true);
-        }}
-        sx={inputStyle}
-        size="medium"
-      />
+      {/* ----------- данные аккаунта ---------------- */}
+      <Box>
+        <p
+          style={{
+            textAlign: "left",
+            marginBlock: 10,
+            fontSize: 17,
+            lineHeight: "22px",
+          }}
+        >
+          Данные аккаунта
+        </p>
+        <TextField
+          label="Логин"
+          fullWidth
+          value={login}
+          onChange={(e) => {
+            setLogin(e.target.value);
+            setDirty(true);
+          }}
+          sx={inputStyle}
+          size="medium"
+        />
 
-      <TextField
-        label="Пароль"
-        fullWidth
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-          setDirty(true);
-        }}
-        sx={inputStyle}
-        size="medium"
-        type={showPassword ? "text" : "password"}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton onClick={() => setShowPassword((p) => !p)} edge="end">
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+        <TextField
+          label="Пароль"
+          fullWidth
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setDirty(true);
+          }}
+          sx={inputStyle}
+          size="medium"
+          type={showPassword ? "text" : "password"}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowPassword((p) => !p)}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
 
-      <TextField
-        label="Завершать после оплаты через"
-        fullWidth
-        value={completeAfterPayment}
-        onChange={(e) => {
-          setCompleteAfterPayment(e.target.value);
-          setDirty(true);
-        }}
-        sx={inputStyle}
-        size="medium"
-        type="number"
-      />
+      {/* ----------- настройки парковки ------------- */}
+      <Box>
+        <p style={{ textAlign: "left", marginBottom: 15, fontSize: 17 }}>
+          Настройки периодичности оплаты парковки
+        </p>
 
-      <TextField
-        label="Оформлять после завершения через"
-        fullWidth
-        value={registerAfterComplete}
-        onChange={(e) => {
-          setRegisterAfterComplete(e.target.value);
-          setDirty(true);
-        }}
-        sx={inputStyle}
-        size="medium"
-        type="number"
-      />
+        {/* завершаем после оплаты */}
+        <TextField
+          label="Завершать после оплаты через"
+          fullWidth
+          type="time"
+          inputProps={{ step: 1 }} // секунда-гранулярность
+          value={minutesToHMS(completeAfterPayment)}
+          onChange={(e) => {
+            setCompleteAfterPayment(HMSToMinutes(e.target.value));
+            setDirty(true);
+          }}
+          sx={inputStyle}
+          size="medium"
+        />
+
+        {/* оформляем заново после завершения */}
+        <TextField
+          label="Оформлять после завершения через"
+          fullWidth
+          type="time"
+          inputProps={{ step: 1 }}
+          value={minutesToHMS(registerAfterComplete)}
+          onChange={(e) => {
+            setRegisterAfterComplete(HMSToMinutes(e.target.value));
+            setDirty(true);
+          }}
+          sx={inputStyle}
+          size="medium"
+        />
+      </Box>
 
       {dirty && (
         <Button
