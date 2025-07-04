@@ -10,17 +10,20 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTelegram } from "../../../utils/telegramHook";
 
+const MAX_MINUTES = 5; // верхний предел
 const minutesToHMS = (m: number | "") => {
   if (m === "") return "00:00:00";
-  const h = Math.floor(+m / 60);
-  const mm = +m % 60;
+  const clamped = Math.min(+m, MAX_MINUTES);
+  const h = Math.floor(clamped / 60);
+  const mm = clamped % 60;
   return `${String(h).padStart(2, "0")}:${String(mm).padStart(2, "0")}:00`;
 };
 
 const HMSToMinutes = (t: string) => {
   const [h = "0", m = "0", s = "0"] = t.split(":");
-  const base = Number(h) * 60 + Number(m);
-  return Number(s) >= 30 ? base + 1 : base;
+  let minutes = Number(h) * 60 + Number(m);
+  if (Number(s) >= 30) minutes += 1; // округляем вверх
+  return Math.min(minutes, MAX_MINUTES);
 };
 
 const inputStyle = {
@@ -187,7 +190,7 @@ const SettingsPage = () => {
           label="Оплачивать парковку (мин. знач. 00:01 минут)"
           fullWidth
           type="time"
-          inputProps={{ step: 1 }}
+          inputProps={{ step: 1, min: "00:01:00", max: "00:05:00" }}
           value={minutesToHMS(completeAfterPayment)}
           onChange={(e) => {
             setCompleteAfterPayment(HMSToMinutes(e.target.value));
@@ -201,7 +204,7 @@ const SettingsPage = () => {
           label="Не оплачивать парковку (не больше 00:05 минут)"
           fullWidth
           type="time"
-          inputProps={{ step: 1 }}
+          inputProps={{ step: 1, min: "00:00:00", max: "00:05:00" }}
           value={minutesToHMS(registerAfterComplete)}
           onChange={(e) => {
             setRegisterAfterComplete(HMSToMinutes(e.target.value));
