@@ -145,7 +145,6 @@ function HomePage() {
     nav("/");
   };
 
-  /* ---------------- styles ---------------- */
   const formControlStyle = {
     mb: 2,
     "& .MuiOutlinedInput-root": {
@@ -216,7 +215,7 @@ function HomePage() {
           getOptionLabel={(opt) => opt.name}
           isOptionEqualToValue={(o, v) => o.id === v.id}
           value={zones.find((z) => z.id.toString() === zone) || null}
-          onChange={(e, newValue) =>
+          onChange={(_, newValue) =>
             setZone(newValue ? newValue.id.toString() : "")
           }
           renderInput={(params) => (
