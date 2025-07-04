@@ -184,7 +184,7 @@ const SettingsPage = () => {
         </p>
 
         <TextField
-          label="Оплачивать парковку (мин. знач. 00:01)"
+          label="Оплачивать парковку (мин. знач. 00:01 минут)"
           fullWidth
           type="time"
           inputProps={{ step: 1 }}
@@ -198,7 +198,7 @@ const SettingsPage = () => {
         />
 
         <TextField
-          label="Не оплачивать парковку (не > 00:05)"
+          label="Не оплачивать парковку (не больше 00:05 минут)"
           fullWidth
           type="time"
           inputProps={{ step: 1 }}
