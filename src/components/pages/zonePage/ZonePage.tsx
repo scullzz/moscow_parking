@@ -59,7 +59,7 @@ const ZoneCard = ({
   >
     <CardContent sx={{ p: 2 }}>
       <Typography fontWeight="bold" sx={{ mb: 1 }}>
-        Зона: {zone}
+        Парковка: {zone}
       </Typography>
       <Typography variant="body2">🚗 Транспорт: {vehicle}</Typography>
       <Typography variant="body2">📅 Начало: {start}</Typography>
