@@ -178,18 +178,16 @@ const SettingsPage = () => {
         />
       </Box>
 
-      {/* ----------- настройки парковки ------------- */}
       <Box>
         <p style={{ textAlign: "left", marginBottom: 15, fontSize: 17 }}>
           Настройки периодичности оплат за парковку
         </p>
 
-        {/* завершаем после оплаты */}
         <TextField
-          label="Завершать после оплаты через"
+          label="Оплачивать парковку (минимальное значение 00:01:00 )"
           fullWidth
           type="time"
-          inputProps={{ step: 1 }} // секунда-гранулярность
+          inputProps={{ step: 1 }}
           value={minutesToHMS(completeAfterPayment)}
           onChange={(e) => {
             setCompleteAfterPayment(HMSToMinutes(e.target.value));
@@ -199,9 +197,8 @@ const SettingsPage = () => {
           size="medium"
         />
 
-        {/* оформляем заново после завершения */}
         <TextField
-          label="Оформлять после завершения через"
+          label="Не оплачивать парковку максимальное значение стоянки не болие 00:04:59)"
           fullWidth
           type="time"
           inputProps={{ step: 1 }}
