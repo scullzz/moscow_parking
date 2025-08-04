@@ -1,12 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/homePage/HomePage";
-import SubscriptionPage from "./pages/subPage/SubscriptionPage";
-import ContactsPage from "./pages/contractPage/ContactsPage";
 import Navigation from "./Navigation";
-import SuccessPayment from "./SuccessPayment";
-import SettingsPage from "./pages/settingsPage/SettingsPage";
-import ZonePage from "./pages/zonePage/ZonePage";
 import useTelegramWebAppInit from "../utils/telegramInit";
+import Profile from "./pages/profile/Profile";
+import Home from "./pages/home/Home";
+import Chat from "./pages/chat/Chat";
 
 function App() {
   useTelegramWebAppInit();
@@ -14,12 +11,10 @@ function App() {
     <div style={{ position: "relative", height: "100vh" }}>
       <div style={{ height: "100%", overflow: "auto" }}>
         <Routes>
-          <Route path="/" element={<ZonePage />} />
-          <Route path="/list" element={<HomePage />} />
-          <Route path="/subscription" element={<SubscriptionPage />} />
-          <Route path="/contacts" element={<ContactsPage />} />
-          <Route path="/success" element={<SuccessPayment />} />
-          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/" element={<Home />} />
+          {/* <Route path="/favorites" element={<Favorite />} /> */}
+          <Route path="/chat" element={<Chat />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
 

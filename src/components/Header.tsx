@@ -1,44 +1,18 @@
-// src/components/Header.tsx
-import { AppBar, IconButton, Toolbar, Typography } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { useTelegram } from "../utils/telegramHook";
+import dm from "./images/main_logo.svg";
 
-function Header() {
-  const tg = useTelegram();
-
-  const handleClose = () => {
-    tg?.close();
-  };
-
+const Header = () => {
   return (
-    <AppBar
-      position="static"
-      color="inherit"
-      elevation={0}
-      sx={{
-        borderBottom: "1px solid #ccc",
+    <div
+      style={{
         display: "flex",
+        justifyContent: "start",
         alignItems: "center",
+        height: "72px",
       }}
     >
-      <Toolbar
-        sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}
-      >
-        <IconButton edge="start" onClick={handleClose}>
-          <CloseIcon />
-        </IconButton>
-
-        <Typography variant="h6" sx={{ flex: 1, textAlign: "center" }}>
-          Moscow Parking
-        </Typography>
-
-        <IconButton edge="end">
-          <MoreVertIcon />
-        </IconButton>
-      </Toolbar>
-    </AppBar>
+      <img style={{ marginLeft: "24px" }} src={dm} alt="dm" />
+    </div>
   );
-}
+};
 
 export default Header;

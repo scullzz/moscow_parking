@@ -1,4 +1,3 @@
-// src/main.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
@@ -6,7 +5,12 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import App from "./components/App";
 import "./index.css";
 const theme = createTheme({
-  palette: { primary: { main: "#1976d2" } },
+  palette: {
+    primary: { main: "#ffffff" },
+  },
+  typography: {
+    fontFamily: "Onest, sans-serif",
+  },
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
