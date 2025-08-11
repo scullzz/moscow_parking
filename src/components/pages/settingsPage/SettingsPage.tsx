@@ -187,7 +187,7 @@ const SettingsPage = () => {
           label="Оплачивать парковку (мин. знач. 00:01 минут)"
           fullWidth
           type="time"
-          inputProps={{ step: 1, min: "00:01:00", max: "00:05:00" }}
+          inputProps={{ step: 1, min: "00:01:00" }}
           value={minutesToHMS(completeAfterPayment)}
           onChange={(e) => {
             setCompleteAfterPayment(HMSToMinutes(e.target.value));
@@ -201,7 +201,7 @@ const SettingsPage = () => {
           label="Не оплачивать парковку (не больше 00:05 минут)"
           fullWidth
           type="time"
-          inputProps={{ step: 1, min: "00:00:00", max: "00:05:00" }}
+          inputProps={{ step: 1, min: "00:00:00" }}
           value={minutesToHMS(registerAfterComplete)}
           onChange={(e) => {
             setRegisterAfterComplete(HMSToMinutes(e.target.value));
