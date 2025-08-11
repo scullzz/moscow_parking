@@ -10,20 +10,19 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTelegram } from "../../../utils/telegramHook";
 
-const MAX_MINUTES = 5; // верхний предел
 const minutesToHMS = (m: number | "") => {
   if (m === "") return "00:00:00";
-  const clamped = Math.min(+m, MAX_MINUTES);
-  const h = Math.floor(clamped / 60);
-  const mm = clamped % 60;
+  const min = Number(m);
+  const h = Math.floor(min / 60);
+  const mm = min % 60;
   return `${String(h).padStart(2, "0")}:${String(mm).padStart(2, "0")}:00`;
 };
 
 const HMSToMinutes = (t: string) => {
   const [h = "0", m = "0", s = "0"] = t.split(":");
   let minutes = Number(h) * 60 + Number(m);
-  if (Number(s) >= 30) minutes += 1; // округляем вверх
-  return Math.min(minutes, MAX_MINUTES);
+  if (Number(s) >= 30) minutes += 1;
+  return minutes;
 };
 
 const inputStyle = {
@@ -52,8 +51,6 @@ const SettingsPage = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  /** минуты в стейте, строка-время в интерфейсе */
   const [completeAfterPayment, setCompleteAfterPayment] = useState<number | "">(
     ""
   );
