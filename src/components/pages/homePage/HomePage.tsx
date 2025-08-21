@@ -127,7 +127,14 @@ function HomePage() {
     })
       .then(async (r) => {
         if (r.ok) {
-          nav("/");
+          nav("/", {
+            replace: true,
+            state: {
+              autoRefresh: true,
+              refreshEveryMs: 30_000,
+              refreshForMs: 5 * 60_000,
+            },
+          });
         } else {
           const err = await r.json().catch(() => ({}));
           throw new Error(err?.message || `Ошибка ${r.status}`);

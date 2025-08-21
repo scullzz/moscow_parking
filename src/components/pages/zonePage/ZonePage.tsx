@@ -7,8 +7,8 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTelegram } from "../../../utils/telegramHook";
 import coin from "./image/coin.png";
 
@@ -26,6 +26,15 @@ interface Session {
   type: "standard" | "advanced";
   status: "active" | "completed";
 }
+
+/* ---------- состояние, которое можем передать через navigate ---------- */
+type NavState =
+  | {
+    autoRefresh?: boolean;      // включить автообновление
+    refreshEveryMs?: number;    // период, по умолчанию 30s
+    refreshForMs?: number;      // длительность, по умолчанию 5min
+  }
+  | null;
 
 /* ---------- утилита ---------- */
 const fmt = (iso: string) =>
@@ -89,7 +98,16 @@ const ZoneCard = ({
 
 const ZonePage = () => {
   const nav = useNavigate();
+  const location = useLocation();
   const tg = useTelegram();
+
+  // читаем конфиг из navigate state (если его передали)
+  const cfg = (location.state as NavState) ?? null;
+  const refreshEveryMs = cfg?.refreshEveryMs ?? 30_000; // 30s
+  const refreshForMs = cfg?.refreshForMs ?? 300_000;    // 5min
+
+  // локальный флаг автообновления
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(!!cfg?.autoRefresh);
 
   const [active, setActive] = useState<Session[] | null>(null);
   const [history, setHistory] = useState<Session[] | null>(null);
@@ -98,7 +116,7 @@ const ZonePage = () => {
   // Ref на скроллбокс
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     Promise.all([
       fetch("https://api.projectdevdnkchain.ru/users/me", {
         headers: { "Content-Type": "application/json", auth: tg?.initData },
@@ -116,16 +134,40 @@ const ZonePage = () => {
         if (h.ok) setHistory(await h.json());
       })
       .catch(console.error);
-  };
-  useEffect(loadData, []);
+  }, [tg?.initData]);
+
+  // первичная загрузка
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   /* ------ автоскролл вниз при загрузке / обновлении данных ------ */
   useEffect(() => {
     if (scrollRef.current) {
-      // Прокрутить в самый низ без анимации
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [active, history]);
+
+  /* ------ автообновление каждые 30с в течение 5 минут ------ */
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    // моментально подёрнем данные
+    loadData();
+
+    const intervalId = setInterval(loadData, refreshEveryMs);
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      setAutoRefresh(false);
+      // очищаем location.state, чтобы авто-режим не включился снова
+      nav(".", { replace: true, state: {} });
+    }, refreshForMs);
+
+    return () => {
+      clearInterval(intervalId);
+      clearTimeout(timeoutId);
+    };
+  }, [autoRefresh, loadData, refreshEveryMs, refreshForMs, nav]);
 
   /* ------ завершение сессии ------ */
   const endSession = async (id: number) => {
@@ -229,8 +271,8 @@ const ZonePage = () => {
           active.map((s) => (
             <ZoneCard
               key={s.id}
-              zone={String(s.option_id)}
-              vehicle={String(s.vehicle_id)}
+              zone={String(s.option_name)}
+              vehicle={String(s.license_plate)}
               start={fmt(s.start_time)}
               end={fmt(s.end_time)}
               duration={s.duration}
